@@ -1,0 +1,286 @@
+:root {
+  /* Google Material-inspired Palette */
+  --primary-color: #1a73e8;
+  /* Google Blue */
+  --primary-dark: #1557b0;
+  --secondary-color: #e8f0fe;
+  /* Light Blue Background */
+  --text-primary: #202124;
+  --text-secondary: #5f6368;
+  --success-color: #1e8e3e;
+  /* Green */
+  --warning-color: #f9ab00;
+  /* Yellow/Orange */
+  --error-color: #d93025;
+  /* Red */
+  --white: #ffffff;
+  --border-color: #dadce0;
+  --shadow-sm: 0 1px 2px 0 rgba(60, 64, 67, 0.3), 0 1px 3px 1px rgba(60, 64, 67, 0.15);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --radius: 8px;
+  --font-family: 'Roboto', -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-family);
+  background-color: #f8f9fa;
+  color: var(--text-primary);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Typography */
+h1,
+h2,
+h3 {
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+h1 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+h2 {
+  font-size: 1.25rem;
+  margin-bottom: 0.75rem;
+}
+
+/* Layout */
+.container {
+  max-width: 600px;
+  /* Mobile-first focus */
+  margin: 0 auto;
+  padding: 1rem;
+  position: relative;
+  z-index: 1;
+}
+
+header {
+  background-color: var(--white);
+  padding: 1rem;
+  box-shadow: var(--shadow-sm);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.25rem;
+  color: var(--primary-color);
+  font-weight: 500;
+}
+
+/* Cards */
+.card {
+  background: var(--white);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  padding: 1rem;
+  margin-bottom: 1rem;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.card:hover {
+  box-shadow: var(--shadow-md);
+}
+
+/* Status Indicators */
+.status-badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 16px;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.status-ontime {
+  background-color: #e6f4ea;
+  color: var(--success-color);
+}
+
+.status-late {
+  background-color: #fef7e0;
+  color: var(--warning-color);
+}
+
+.status-cancelled {
+  background-color: #fce8e6;
+  color: var(--error-color);
+}
+
+/* Utilities */
+.text-muted {
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+}
+
+.flex-between {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.mt-1 {
+  margin-top: 0.5rem;
+}
+
+.mb-1 {
+  margin-bottom: 0.5rem;
+}
+
+.w-100 {
+  width: 100%;
+}
+
+.text-center {
+  text-align: center;
+}
+
+/* Buttons */
+.btn {
+  display: inline-block;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: var(--radius);
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: center;
+  text-decoration: none;
+  transition: background-color 0.2s;
+}
+
+.btn-primary {
+  background-color: var(--primary-color);
+  color: var(--white);
+}
+
+.btn-primary:hover {
+  background-color: var(--primary-dark);
+}
+
+.btn-danger {
+  background-color: var(--error-color);
+  color: var(--white);
+}
+
+.btn-large {
+  padding: 1.5rem;
+  font-size: 1.25rem;
+  width: 100%;
+  margin-bottom: 0.75rem;
+}
+
+/* Inputs */
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-control {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius);
+  font-size: 1rem;
+}
+
+/* Animations */
+@keyframes pulse {
+  0% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.6;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+.live-indicator {
+  width: 8px;
+  height: 8px;
+  background-color: var(--success-color);
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 5px;
+  animation: pulse 2s infinite;
+}
+
+/* Timeline Styles (Google Maps like) */
+.timeline {
+  position: relative;
+  margin: 1rem 0;
+  padding-left: 1.5rem;
+  /* Space for the line */
+}
+
+.timeline-line {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 7px;
+  /* Center of the dot */
+  width: 2px;
+  background-color: var(--border-color);
+  z-index: 1;
+}
+
+.timeline-item {
+  position: relative;
+  margin-bottom: 1rem;
+  padding-left: 1rem;
+}
+
+.timeline-item:last-child {
+  margin-bottom: 0;
+}
+
+.timeline-dot {
+  position: absolute;
+  left: -1.5rem;
+  /* Adjust based on padding */
+  top: 4px;
+  width: 16px;
+  height: 16px;
+  background-color: var(--white);
+  border: 4px solid var(--text-secondary);
+  /* Default grey dot */
+  border-radius: 50%;
+  z-index: 2;
+}
+
+/* Highlight start/end or current location */
+.timeline-item:first-child .timeline-dot {
+  border-color: var(--primary-color);
+}
+
+.timeline-item:last-child .timeline-dot {
+  border-color: var(--error-color);
+  /* Destination marker color */
+}
+
+.timeline-content {
+  font-size: 0.95rem;
+  color: var(--text-primary);
+}
+
+.hidden {
+  display: none !important;
+}
