@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>College Bus Status</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+  <!-- Trip Selection Modal -->
+  <div id="trip-selector"
+    style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 2000; display: flex; flex-direction: column; justify-content: center; align-items: center; backdrop-filter: blur(5px);">
+    <h1 style="color: white; margin-bottom: 2rem; text-align: center;">Select Your Trip</h1>
+    <div style="display: flex; gap: 2rem; flex-wrap: wrap; justify-content: center;">
+      <button onclick="selectTrip('SENIOR')" class="btn"
+        style="background: white; color: var(--primary-color); padding: 2rem; font-size: 1.5rem; text-align: center; border-radius: 16px; min-width: 200px; transition: transform 0.2s;">
+        👨‍🎓<br>Senior's Trip
+      </button>
+      <button onclick="selectTrip('JUNIOR')" class="btn"
+        style="background: white; color: var(--primary-color); padding: 2rem; font-size: 1.5rem; text-align: center; border-radius: 16px; min-width: 200px; transition: transform 0.2s;">
+        👦<br>Junior's Trip
+      </button>
+    </div>
+  </div>
+
+  <header>
+    <div class="brand">
+      <a href="index.html"
+        style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 0.5rem;">
+        🚌 Bus Status
+      </a>
+    </div>
+    <div style="display: flex; align-items: center; gap: 1rem;">
+      <a href="index.html"
+        style="text-decoration: none; font-size: 0.875rem; color: var(--primary-color); font-weight: 500;">Home</a>
+      <div class="text-muted">
+        <span class="live-indicator"></span>Live
+      </div>
+    </div>
+  </header>
+
+  <div class="container">
+    <div class="form-group">
+      <input type="text" id="search-input" class="form-control" placeholder="Search by Bus Number or Place..."
+        onkeyup="renderBuses()">
+    </div>
+
+    <div id="bus-list">
+      <!-- Bus cards will be injected here -->
+      <div class="text-center mt-1">
+        <p class="text-muted">Loading bus status...</p>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+  <script>
+    let currentTripType = null;
+
+    function selectTrip(type) {
+      currentTripType = type;
+      document.getElementById('trip-selector').style.display = 'none';
+
+      // Update header title to reflect selection - Optional but nice
+      const title = type === 'SENIOR' ? "Senior's Trip Bus Status" : "Junior's Trip Bus Status";
+      document.title = title;
+      // You could update a visible header element too if desired
+
+      renderBuses();
+    }
+
+    function renderBuses() {
+      if (!currentTripType) return; // Don't render until choice is made
+
+      const allBuses = busSystem.getAllBuses();
+      const container = document.getElementById('bus-list');
+      const searchQuery = document.getElementById('search-input').value.toLowerCase();
+
+      // Pre-filter by trip type, default to SENIOR if missing for backward compat
+      const tripBuses = allBuses.filter(bus => (bus.tripType || 'SENIOR') === currentTripType);
+
+      const filteredBuses = tripBuses.filter(bus => {
+        const route = bus.route.toLowerCase();
+        const number = bus.number.toLowerCase();
+        const location = (LOCATION_MAP[bus.location] || bus.location).toLowerCase();
+
+        return route.includes(searchQuery) ||
+          number.includes(searchQuery) ||
+          location.includes(searchQuery);
+      });
+
+      if (filteredBuses.length === 0) {
+        container.innerHTML = '<p class="text-center text-muted">No buses found matching your search.</p>';
+        return;
+      }
+
+      container.innerHTML = filteredBuses.map(bus => {
+        const statusInfo = STATUS_MAP[bus.status] || { label: bus.status, class: '' };
+        const locationText = LOCATION_MAP[bus.location] || bus.location;
+        const timeText = busSystem.formatTime(bus.lastUpdated);
+        let stopsHtml = '';
+        if (bus.stops && bus.stops.length > 0) {
+          stopsHtml = `
+            <div class="timeline">
+              <div class="timeline-line"></div>
+              ${bus.stops.map(stop => `
+                <div class="timeline-item">
+                  <div class="timeline-dot"></div>
+                  <div class="timeline-content">${stop}</div>
+                </div>
+              `).join('')}
+            </div>
+          `;
+        } else {
+          stopsHtml = '<div class="text-muted" style="margin-left: 1rem;">No stops info available</div>';
+        }
+
+        const mapBtn = bus.mapUrl ? `
+            <a href="${bus.mapUrl}" target="_blank" class="btn btn-primary w-100 mt-1" style="text-decoration: none; display: block;">
+                View on Google Maps 🗺️
+            </a>
+        ` : '';
+
+        return `
+          <div class="card">
+            <div class="flex-between mb-1">
+              <h3>${bus.route}</h3>
+              <span class="status-badge ${statusInfo.class}">${statusInfo.label}</span>
+            </div>
+            <div class="text-muted mb-1">
+              <strong>Bus No:</strong> ${bus.number}
+            </div>
+            <div class="mb-1">
+             📍 Live location : ${locationText}
+            </div>
+            
+            <div class="mb-1">
+              <div class="flex-between">
+                 <strong>Route:</strong>
+                 <button class="btn" style="padding: 0.25rem 0.5rem; font-size: 0.8rem; background-color: var(--secondary-color); color: var(--primary-color);" onclick="toggleRoute('${bus.id}', this)">Show Route 🔽</button>
+              </div>
+              <div id="route-${bus.id}" class="hidden mt-1">
+                ${stopsHtml}
+              </div>
+            </div>
+
+            ${mapBtn}
+
+            <div class="text-muted" style="font-size: 0.75rem; text-align: right; margin-top: 0.5rem;">
+              Updated: ${timeText}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Initial render
+    renderBuses();
+
+    // Auto-refresh every 30 seconds
+    setInterval(renderBuses, 30000);
+
+    // Also refresh on window focus to get immediate updates if user switches tabs
+    window.addEventListener('focus', renderBuses);
+
+    function toggleRoute(busId, btn) {
+      const routeDiv = document.getElementById(`route-${busId}`);
+      if (routeDiv.classList.contains('hidden')) {
+        routeDiv.classList.remove('hidden');
+        btn.textContent = 'Hide Route 🔼';
+      } else {
+        routeDiv.classList.add('hidden');
+        btn.textContent = 'Show Route 🔽';
+      }
+    }
+  </script>
+  <script src="antigravity.js"></script>
+</body>
+
+</html>
